@@ -98,6 +98,18 @@ Write DNS server zone files from a Palletjack warehouse"
       end
     end
 
+    if domain['net.service.ntp']
+      domain['net.service.ntp'].each do |server|
+        srv = DNS::Zone::RR::SRV.new
+        srv.label = "_ntp._udp"
+        srv.target = server
+        srv.port = 123
+        srv.priority = 0
+        srv.weight = 0
+        zone.records << srv
+      end
+    end
+
     domain.children(kind: 'ipv4_interface') do |interface|
       a = DNS::Zone::RR::A.new
       a.label = interface['net.dns.name']

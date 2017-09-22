@@ -11,3 +11,5 @@ net:
       - address: zabbix.example.com
       - address: zabbix2
         port: 10051
+    ntp:
+      - freeipa1
