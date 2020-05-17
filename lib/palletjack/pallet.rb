@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'palletjack/pallet/identity'
 require 'palletjack/errors'
 require 'traceable'
@@ -40,8 +42,10 @@ module PalletJack
         case
         when (filestat.file? and file =~ /\.yaml$/)
           # Parsing an empty YAML file returns false, which is allowed
+          # rubocop:disable Layout/ArgumentAlignment
           yaml = TraceableYAML::load_file(filepath,
                    filepath.sub(@identity.warehouse, '')[1..-1]) || {}
+          # rubocop:enable Layout/ArgumentAlignment
           unless yaml.is_a? Hash
             raise PalletJack::WarehouseError.new(
               "Box #{filepath} contains a #{yaml.class}, expected a Hash"
@@ -72,7 +76,7 @@ module PalletJack
     end
 
     def inspect
-      '#<%s:%x>' % [self.class, self.object_id, @path]
+      format('#<%<cls>s:%<id>x>', cls: self.class, id: self.object_id)
     end
 
     # Override standard to_yaml serialization, because pallet objects

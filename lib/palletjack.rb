@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'palletjack/version.rb'
 require 'palletjack/warehouse.rb'
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # Write DNS server zone files from a Palletjack warehouse
 #
@@ -29,10 +30,12 @@ class PalletJack2Zones < PalletJack::Tool
   end
 
   def parse_options(opts)
+    # rubocop:disable Layout/FirstArgumentIndentation
     opts.banner =
 "Usage: #{$PROGRAM_NAME} -w <warehouse> -o <output directory>
 
 Write DNS server zone files from a Palletjack warehouse"
+    # rubocop:enable Layout/FirstArgumentIndentation
 
     opts.on('-o DIR', '--output DIR', 'output directory', String) {|dir|
       options[:output] = dir
@@ -58,14 +61,12 @@ Write DNS server zone files from a Palletjack warehouse"
     zone.soa.nameserver = domain['net.dns.soa-ns']
     zone.soa.email = "#{domain['net.dns.soa-contact']}.".sub('@', '.')
 
-    if domain['net.dns.mx']
-      domain['net.dns.mx'].each do |server|
-        mx = DNS::Zone::RR::MX.new
-        mx.label = absolute_domain_name
-        mx.priority = server['priority']
-        mx.exchange = server['server']
-        zone.records << mx
-      end
+    domain['net.dns.mx']&.each do |server|
+      mx = DNS::Zone::RR::MX.new
+      mx.label = absolute_domain_name
+      mx.priority = server['priority']
+      mx.exchange = server['server']
+      zone.records << mx
     end
 
     domain['net.dns.ns'].each do |address|
@@ -75,36 +76,30 @@ Write DNS server zone files from a Palletjack warehouse"
       zone.records << ns
     end
 
-    if domain['net.dns.cname']
-      domain['net.dns.cname'].each do |name, target|
-        cname = DNS::Zone::RR::CNAME.new
-        cname.label = name
-        cname.domainname = target
-        zone.records << cname
-      end
+    domain['net.dns.cname']&.each do |name, target|
+      cname = DNS::Zone::RR::CNAME.new
+      cname.label = name
+      cname.domainname = target
+      zone.records << cname
     end
 
-    if domain['net.dns.srv']
-      domain['net.dns.srv'].each do |service|
-        srv = DNS::Zone::RR::SRV.new
-        srv.label = "_#{service['service']}._#{service['protocol']}"
-        srv.target = service['target']
-        srv.port = service['port']
-        service['priority'] ||= 0
-        srv.priority = service['priority']
-        service['weight'] ||= 0
-        srv.weight = service['weight']
-        zone.records << srv
-      end
+    domain['net.dns.srv']&.each do |service|
+      srv = DNS::Zone::RR::SRV.new
+      srv.label = "_#{service['service']}._#{service['protocol']}"
+      srv.target = service['target']
+      srv.port = service['port']
+      service['priority'] ||= 0
+      srv.priority = service['priority']
+      service['weight'] ||= 0
+      srv.weight = service['weight']
+      zone.records << srv
     end
 
-    if domain['net.dns.txt']
-      domain['net.dns.txt'].each do |record|
-        txt = DNS::Zone::RR::TXT.new
-        txt.label = record['label'] || absolute_domain_name
-        txt.text = record['text']
-        zone.records << txt
-      end
+    domain['net.dns.txt']&.each do |record|
+      txt = DNS::Zone::RR::TXT.new
+      txt.label = record['label'] || absolute_domain_name
+      txt.text = record['text']
+      zone.records << txt
     end
 
     domain.children(kind: 'ipv4_interface') do |interface|
@@ -113,13 +108,11 @@ Write DNS server zone files from a Palletjack warehouse"
       a.address = interface['net.ipv4.address']
       zone.records << a
 
-      if interface['net.dns.alias']
-        interface['net.dns.alias'].each do |label|
-          cname = DNS::Zone::RR::CNAME.new
-          cname.label = label
-          cname.domainname = interface['net.dns.name']
-          zone.records << cname
-        end
+      interface['net.dns.alias']&.each do |label|
+        cname = DNS::Zone::RR::CNAME.new
+        cname.label = label
+        cname.domainname = interface['net.dns.name']
+        zone.records << cname
       end
     end
 

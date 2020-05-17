@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PalletJack
   class Pallet < KVDAG::Vertex
     # Represents the identity aspects of a warehouse pallet

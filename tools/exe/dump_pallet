@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # Simple script for dumping a specified pallet as YAML.
 
@@ -6,17 +7,21 @@ require 'palletjack/tool'
 
 class DumpPallet < PalletJack::Tool
   def parse_options(parser)
-    parser.banner = "Usage: #{$PROGRAM_NAME} [options] [<name> ...]
+    # rubocop:disable Layout/FirstArgumentIndentation
+    parser.banner =
+"Usage: #{$PROGRAM_NAME} [options] [<name> ...]
 
 Dump the YAML representation of all named pallets in a Palletjack warehouse
 
 If a name is specified, dump only that pallet. Otherwise, dump all
 pallets of the specified type."
+    # rubocop:enable Layout/FirstArgumentIndentation
 
     # The preset value for options[:type] will be overridden when
     # the parse! method of the parser is eventually run and finds
     # a --type option. Keep declarations in that order for clarity.
 
+    # rubocop:disable Layout/ClosingParenthesisIndentation
     options[:type] = 'system'
     parser.on('-t TYPE', '--type TYPE',
               'type (default "system")',
@@ -36,6 +41,7 @@ pallets of the specified type."
     parser.on('-p', '--[no-]position',
               'output source file name and position of each value'
              ) {|maybe| TraceableString.debug = maybe }
+    # rubocop:enable Layout/ClosingParenthesisIndentation
   end
 
   # Dump the yaml contents of all pallets given to STDOUT

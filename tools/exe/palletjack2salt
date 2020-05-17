@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # Write YAML files containing Salt pillar data.
 #
@@ -41,10 +42,12 @@ require 'yaml'
 
 class PalletJack2Salt < PalletJack::Tool
   def parse_options(opts)
+    # rubocop:disable Layout/FirstArgumentIndentation
     opts.banner =
 "Usage: #{$PROGRAM_NAME} -w <warehouse> [ -g <dir> ] [ -m <dir> ]
 
 Write Salt pillar data from a Palletjack warehouse."
+    # rubocop:enable Layout/FirstArgumentIndentation
 
     opts.on('-g DIR', '--global DIR', 'global pillar directory',
             String) {|dir| options[:global_pillar] = dir }
@@ -134,12 +137,10 @@ Write Salt pillar data from a Palletjack warehouse."
       end
     end
 
-    if @salt_config[:minion]
-      @salt_config[:minion].each do |id, config|
-        config_file :minion_pillar, "#{id}.yaml" do |yamlfile|
-          yamlfile << git_header('palletjack2salt')
-          yamlfile << config.to_yaml
-        end
+    @salt_config[:minion]&.each do |id, config|
+      config_file :minion_pillar, "#{id}.yaml" do |yamlfile|
+        yamlfile << git_header('palletjack2salt')
+        yamlfile << config.to_yaml
       end
     end
   end

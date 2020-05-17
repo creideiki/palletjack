@@ -1,7 +1,8 @@
 #-*- ruby -*-
 # coding: utf-8
+# frozen_string_literal: true
 
-lib = File.expand_path('../../lib', __FILE__)
+lib = File.expand_path('../lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'palletjack/version'
 
@@ -23,20 +24,20 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.platform	= Gem::Platform::RUBY
-  spec.required_ruby_version = '~>2'
+  spec.required_ruby_version = '>=2.4'
 
-  spec.add_runtime_dependency 'palletjack', PalletJack::VERSION
   spec.add_runtime_dependency 'dns-zone', '~> 0.3'
-  spec.add_runtime_dependency 'ruby-ip', '~> 0.9'
-  spec.add_runtime_dependency 'json', '~> 1.8'
-  spec.add_runtime_dependency 'ipa-ruby', '~> 0.0'
   spec.add_runtime_dependency 'hashie', '~> 3'
+  spec.add_runtime_dependency 'ipa-ruby', '~> 0.0'
+  spec.add_runtime_dependency 'json', '~> 1.8'
+  spec.add_runtime_dependency 'palletjack', PalletJack::VERSION
+  spec.add_runtime_dependency 'ruby-ip', '~> 0.9'
 
   spec.add_development_dependency 'bundler', '~> 1.13'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
-  spec.add_development_dependency 'rspec_structure_matcher', '~> 0.0.6'
   spec.add_development_dependency 'rspec-collection_matchers', '~> 1.1.2'
+  spec.add_development_dependency 'rspec_structure_matcher', '~> 0.0.6'
 
   spec.has_rdoc	= true
 end
