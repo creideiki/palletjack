@@ -66,6 +66,12 @@ end
 class TraceableString < String
   include Traceable
 
+  # Deduplicate this String, if possible. This is not possible on a
+  # TraceableString, so return itself.
+  def -@
+    self
+  end
+
   def encode_with(coder)
     coder.tag = nil
     coder.scalar = self.to_str
