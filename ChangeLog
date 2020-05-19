@@ -1,5 +1,10 @@
 Development
 
+  Tool changes:
+
+    * New tool palletjack2ansible, for writing Ansible inventories and
+      variable files
+
   Packaging changes:
 
     * Fixed incompatibility with Ruby 2.7
