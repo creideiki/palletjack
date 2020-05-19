@@ -56,7 +56,7 @@ Write configuration for the Kea DHCP server from a Palletjack warehouse"
       end
 
       if net['net.dns.resolver']
-        resolvers = ''
+        resolvers = String.new
         net['net.dns.resolver'].each do |resolver|
           resolvers << resolver << ', '
         end
