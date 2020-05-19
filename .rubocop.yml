@@ -1,13 +1,26 @@
 inherit_from: .rubocop_todo.yml
 
-Layout/IndentArray:
+Layout/FirstArrayElementIndentation:
   EnforcedStyle: consistent
-Style/MethodName:
+Naming/MethodName:
   EnforcedStyle: snake_case
 Style/SymbolArray:
   EnforcedStyle: brackets
-Lint/HandleExceptions:
+Style/WordArray:
+  EnforcedStyle: brackets
+Lint/SuppressedException:
   Exclude:
     - 'spec/palletjack-tool_spec.rb'
 Style/Not:
   Enabled: false
+Layout/EmptyLineAfterGuardClause:
+  Exclude:
+    - 'tools/exe/palletjack2ipahost'
+Layout/HashAlignment:
+  EnforcedColonStyle: table
+Style/RedundantReturn:
+  Exclude:
+    - 'lib/palletjack/tool.rb'
+Style/RescueStandardError:
+  Exclude:
+    - 'lib/palletjack/tool.rb'

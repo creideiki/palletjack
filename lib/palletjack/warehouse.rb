@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support'
 require 'yaml'
 require 'kvdag'
@@ -36,6 +38,7 @@ module PalletJack
         Dir.foreach(kindpath) do |pallet|
           palletpath = File.join(kindpath, pallet)
           next unless File.directory?(palletpath) && pallet !~ /^\.{1,2}$/
+
           pallet(kind, pallet)
         end
       end
@@ -90,6 +93,7 @@ module PalletJack
       if result.length != 1
         raise KeyError.new("#{filter} matched #{result.length} pallets")
       end
+
       result.first
     end
   end

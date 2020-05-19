@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # Create a domain and IPv4 network in a warehouse
 #
@@ -9,10 +10,12 @@ require 'palletjack/tool'
 
 class CreateDomain < PalletJack::Tool
   def parse_options(opts)
+    # rubocop:disable Layout/FirstArgumentIndentation
     opts.banner =
 "Usage: #{$PROGRAM_NAME} -w <warehouse> -d <domain> -n <IPv4 network>
 
 Create domain and ipv4_network objects in a warehouse"
+    # rubocop:enable Layout/FirstArgumentIndentation
 
     opts.on('-d DOMAIN', '--domain DOMAIN', 'domain name', String) {|domain|
       options[:domain] = domain }
@@ -33,7 +36,7 @@ Create domain and ipv4_network objects in a warehouse"
     end
     pallet_box 'ipv4_network', :network, 'identity' do
       { net: { ipv4: { gateway: '' },
-               dns: { resolver: [''] } } }
+               dns:  { resolver: [''] } } }
     end
 
     # Create the DNS domain object

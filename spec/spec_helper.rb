@@ -1,4 +1,6 @@
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'palletjack'
 require 'rspec/collection_matchers'
-$EXAMPLE_WAREHOUSE = File.expand_path('../../examples/warehouse', __FILE__)
+$EXAMPLE_WAREHOUSE = File.expand_path('../examples/warehouse', __dir__)

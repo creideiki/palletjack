@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 require 'traceable'
 
 module PalletJack
   class KeyTransformer
     class Reader < KeyTransformer
       def concatenate(param, context = {})
-        context[:value].split(param) if context[:value]
+        context[:value]&.split(param)
       end
     end
 
     class Writer < KeyTransformer
       def concatenate(param, context = {})
-        context[:value].join(param) if context[:value]
+        context[:value]&.join(param)
       end
 
       # Internal synthesize* helper method
@@ -52,6 +54,7 @@ module PalletJack
           if md = rex.match(param)
             result << md.pre_match
             return unless lookup = dictionary[md[1]]
+
             result << lookup.to_s
             synthesize_internal(md.post_match, dictionary, result)
           else

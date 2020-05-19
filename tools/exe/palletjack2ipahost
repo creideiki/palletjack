@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # Create host objects in a FreeIPA instance.
 #
@@ -27,12 +28,14 @@ require 'hashie'
 
 class PalletJack2IPAHost < PalletJack::Tool
   def parse_options(opts)
+    # rubocop:disable Layout/FirstArgumentIndentation
     opts.banner =
 "Usage: #{$PROGRAM_NAME} -w <warehouse> -i <IPA server> [-s <system> [--reinstall]] [-v]
 
 Synchronize systems in the warehouse to host objects in an IPA server.
 
 Requres a valid Kerberos ticket for a FreeIPA administrator."
+    # rubocop:enable Layout/FirstArgumentIndentation
 
     opts.on('-i SERVER', '--ipa-server SERVER', 'IPA server',
             String) { |srv| options[:ipa] = srv }

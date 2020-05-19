@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # Create a system in a warehouse
 
@@ -6,11 +7,13 @@ require 'palletjack/tool'
 
 class CreateSystem < PalletJack::Tool
   def parse_options(opts)
+    # rubocop:disable Layout/FirstArgumentIndentation
     opts.banner =
 "Usage: #{$PROGRAM_NAME} -w <warehouse> -s <system> -d <domain> \\
                       [ -o <os> | -n <netinstall> ]
 
 Create system objects in a warehouse"
+    # rubocop:enable Layout/FirstArgumentIndentation
 
     opts.on('-s SYSTEM', '--system SYSTEM', 'system name', String) {|system|
       options[:system] = system }
@@ -33,6 +36,7 @@ Create system objects in a warehouse"
       { system: { role: [''] } }
     end
     pallet_links 'system', :system, 'domain' => ['domain', :domain]
+    # rubocop:disable Layout/ArgumentAlignment
     pallet_links 'system', :system,
       if options[:os]
         { 'os' => ['os', :os], 'netinstall' => [] }
@@ -41,6 +45,7 @@ Create system objects in a warehouse"
       else
         abort('Both --os and --netinstall were nil; should not happen!')
       end
+    # rubocop:enable Layout/ArgumentAlignment
   end
 end
 

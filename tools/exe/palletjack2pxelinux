@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # Write PXELINUX boot menus from a Palletjack warehouse
 #
@@ -52,10 +53,12 @@ require 'fileutils'
 
 class PalletJack2PXELinux < PalletJack::Tool
   def parse_options(opts)
+    # rubocop:disable Layout/FirstArgumentIndentation
     opts.banner =
 "Usage: #{$PROGRAM_NAME} -w <warehouse> -o <output directory>
 
 Write PXELINUX boot configuration files from a Palletjack warehouse"
+    # rubocop:enable Layout/FirstArgumentIndentation
 
     opts.on('-o DIR', '--output DIR', 'output directory (tftpboot/)',
             String) {|dir| options[:output] = dir }
@@ -117,6 +120,7 @@ MENU TITLE #{os_label} Installation Menu
 
       os.descendants(kind: 'netinstall') do |netinstall|
         next unless ni_label = netinstall['host.netinstall.label']
+
         config = netinstall['host.pxelinux.config']
         kernel = netinstall['host.pxelinux.kernel']
         append = netinstall['host.pxelinux.append']

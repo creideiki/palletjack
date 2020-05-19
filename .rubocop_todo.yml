@@ -22,7 +22,7 @@ Lint/AssignmentInCondition:
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyleAlignWith, SupportedStylesAlignWith.
 # SupportedStylesAlignWith: either, start_of_block, start_of_line
-Lint/BlockAlignment:
+Layout/BlockAlignment:
   Exclude:
     - 'tools/exe/palletjack2ipahost'
     - 'tools/spec/palletjack2kea_spec.rb'
@@ -83,15 +83,15 @@ Metrics/BlockLength:
 # Offense count: 3
 # Configuration parameters: CountComments.
 Metrics/ClassLength:
-  Max: 147
+  Max: 149
 
 Metrics/CyclomaticComplexity:
-  Max: 8
+  Max: 9
 
 # Offense count: 13
 # Configuration parameters: AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
 # URISchemes: http, https
-Metrics/LineLength:
+Layout/LineLength:
   Max: 122
 
 # Offense count: 26
@@ -105,19 +105,7 @@ Metrics/ParameterLists:
   Max: 6
 
 Metrics/PerceivedComplexity:
-  Max: 8
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Performance/RedundantBlockCall:
-  Exclude:
-    - 'lib/palletjack/tool.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
-Performance/StringReplacement:
-  Exclude:
-    - 'tools/exe/palletjack2pxelinux'
+  Max: 9
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -131,7 +119,7 @@ Style/Alias:
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles, IndentationWidth.
 # SupportedStyles: with_first_parameter, with_fixed_indentation
-Layout/AlignParameters:
+Layout/ParameterAlignment:
   Exclude:
     - 'lib/palletjack/pallet.rb'
     - 'tools/exe/create_ipv4_interface'
@@ -180,15 +168,6 @@ Layout/BlockEndNewline:
     - 'tools/exe/create_domain'
     - 'tools/exe/create_ipv4_interface'
     - 'tools/exe/create_system'
-
-# Offense count: 8
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, SupportedStyles.
-# SupportedStyles: braces, no_braces, context_dependent
-Style/BracesAroundHashParameters:
-  Exclude:
-    - 'tools/spec/palletjack2kea_spec.rb'
-    - 'tools/spec/palletjack2unbound_spec.rb'
 
 # Offense count: 1
 # Configuration parameters: EnforcedStyle, SupportedStyles.
@@ -271,7 +250,7 @@ Layout/ExtraSpacing:
 # Offense count: 3
 # Configuration parameters: ExpectMatchingDefinition, Regex, IgnoreExecutableScripts, AllowedAcronyms.
 # AllowedAcronyms: CLI, DSL, ACL, API, ASCII, CPU, CSS, DNS, EOF, GUID, HTML, HTTP, HTTPS, ID, IP, JSON, LHS, QPS, RAM, RHS, RPC, SLA, SMTP, SQL, SSH, TCP, TLS, TTL, UDP, UI, UID, UUID, URI, URL, UTF8, VM, XML, XMPP, XSRF, XSS
-Style/FileName:
+Naming/FileName:
   Exclude:
     - 'spec/example-warehouse_spec.rb'
     - 'spec/palletjack-pallet_spec.rb'
@@ -342,21 +321,15 @@ Style/HashSyntax:
 Style/IfUnlessModifier:
   Exclude:
     - 'tools/exe/*'
+    - 'lib/palletjack/warehouse.rb'
 
 # Offense count: 16
 # Cop supports --auto-correct.
 # Configuration parameters: IndentationWidth.
-Layout/IndentAssignment:
+Layout/AssignmentIndentation:
   Exclude:
     - 'lib/palletjack/tool.rb'
-    - 'tools/exe/create_domain'
-    - 'tools/exe/create_ipv4_interface'
-    - 'tools/exe/create_system'
-    - 'tools/exe/palletjack2ipahost'
-    - 'tools/exe/palletjack2kea'
-    - 'tools/exe/palletjack2pxelinux'
-    - 'tools/exe/palletjack2salt'
-    - 'tools/exe/palletjack2unbound'
+    - 'tools/exe/*'
     - 'tools/lib/palletjack2zones.rb'
     - 'tools/spec/palletjack2kea_spec.rb'
     - 'tools/spec/palletjack2salt_spec.rb'
