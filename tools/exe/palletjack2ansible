@@ -1,0 +1,140 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Write YAML files containing Ansible inventory data.
+#
+# Intended to be run from a Git post-update hook or similar, since
+# running the entire Pallet Jack infrastructure for every Ansible
+# invocation is a bit excessive, writing Ansible inventory and
+# variable files in YAML format.
+
+require 'palletjack/tool'
+require 'yaml'
+
+class PalletJack2Ansible < PalletJack::Tool
+  def parse_options(opts)
+    # rubocop:disable Layout/FirstArgumentIndentation
+    opts.banner =
+"Usage: #{$PROGRAM_NAME} -w <warehouse> [ -d <dir> ]
+
+Write Ansible inventory data from a Palletjack warehouse.
+
+The inventory will be written to $dir/inventory.yaml, with
+global variables written to $dir/group_vars/all and host variables
+to $dir/host_vars/$hostname."
+    # rubocop:enable Layout/FirstArgumentIndentation
+
+    opts.on('-d DIR', '--directory DIR', 'Ansible inventory directory',
+            String) { |dir| options[:dir] = dir }
+
+    required_option :dir
+  end
+
+  # Helpers for generating inventory
+
+  def process_inventory
+    inventory = { 'all' => { 'hosts' => {} } }
+    jack.each(kind: 'system') do |system|
+      inventory['all']['hosts'][system['net.dns.fqdn']] = nil
+    end
+    inventory
+  end
+
+  # Helpers for generating global variables
+
+  def process_global_variables
+    result = {}
+
+    config['variables.global.each-pallet']&.each do |dst_key, kind|
+      result[dst_key] ||= {}
+
+      jack.each(kind: kind) do |pallet|
+        result[dst_key][pallet.full_name] = pallet.to_hash.except('pallet')
+      end
+    end
+
+    config['variables.global.each-leaf-pallet']&.each do |dst_key, kind|
+      result[dst_key] ||= {}
+
+      jack.each(kind: kind) do |pallet|
+        next unless pallet.children(kind: kind).empty?
+
+        result[dst_key][pallet.full_name] = pallet.to_hash.except('pallet')
+      end
+    end
+
+    result
+  end
+
+  # Helpers for generating host variables
+
+  def ipv4_interfaces(system)
+    result = {}
+
+    system.children(kind: 'ipv4_interface') do |interface|
+      result[interface['net.layer2.name']] = {
+        interface['net.ipv4.address'] =>
+        interface.filter('net.ipv4', 'net.layer2').to_hash
+      }
+    end
+
+    result
+  end
+
+  def process_host_variables
+    result = {}
+
+    jack.each(kind: 'system') do |system|
+      yaml_output = {}
+      yaml_output['ipv4_interfaces'] = ipv4_interfaces(system)
+
+      config['variables.per-host.each-subtree'].each do |dst_key, src_key|
+        yaml_output[dst_key] = system.fetch(src_key)
+      end
+
+      result[system['net.dns.fqdn']] = { 'palletjack' => yaml_output }
+    end
+
+    result
+  end
+
+  # The internal representation of the generated configuration, ready
+  # to be tested or printed.
+
+  attr_reader :ansible_config
+
+  def process
+    @ansible_config = {}
+
+    @ansible_config[:inventory] = process_inventory
+    @ansible_config[:global] = process_global_variables
+    @ansible_config[:hosts] = process_host_variables
+  end
+
+  def output
+    config_dir :dir
+    config_file :dir, 'inventory.yaml' do |inventory_file|
+      inventory_file << @ansible_config[:inventory].to_yaml
+    end
+
+    config_dir :dir, 'group_vars'
+    config_file :dir, 'group_vars', 'all' do |varfile|
+      varfile << git_header('palletjack2ansible')
+      varfile <<
+        { 'palletjack' => { 'global' => @ansible_config[:global] } }.to_yaml
+    end
+
+    config_dir :dir, 'host_vars'
+
+    @ansible_config[:hosts].each do |id, config|
+      config_file :dir, 'host_vars', "#{id}.yaml" do |yamlfile|
+        yamlfile << git_header('palletjack2ansible')
+        yamlfile << config.to_yaml
+      end
+    end
+  end
+end
+
+if PalletJack2Ansible.standalone?(__FILE__)
+  PalletJack2Ansible.run
+end
