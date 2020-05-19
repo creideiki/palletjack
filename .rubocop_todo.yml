@@ -193,6 +193,7 @@ Style/ColonMethodCall:
 # Cop supports --auto-correct.
 Layout/CommentIndentation:
   Exclude:
+    - 'tools/spec/palletjack2ansible_spec.rb'
     - 'tools/spec/palletjack2salt_spec.rb'
 
 # Offense count: 1
@@ -290,6 +291,7 @@ Style/GlobalVars:
     - 'spec/palletjack-tool_spec.rb'
     - 'spec/palletjack_spec.rb'
     - 'spec/spec_helper.rb'
+    - 'tools/spec/palletjack2ansible_spec.rb'
     - 'tools/spec/palletjack2kea_spec.rb'
     - 'tools/spec/palletjack2salt_spec.rb'
     - 'tools/spec/palletjack2unbound_spec.rb'
@@ -331,6 +333,7 @@ Layout/AssignmentIndentation:
     - 'lib/palletjack/tool.rb'
     - 'tools/exe/*'
     - 'tools/lib/palletjack2zones.rb'
+    - 'tools/spec/palletjack2ansible_spec.rb'
     - 'tools/spec/palletjack2kea_spec.rb'
     - 'tools/spec/palletjack2salt_spec.rb'
 
@@ -375,6 +378,7 @@ Layout/MultilineMethodCallBraceLayout:
   Exclude:
     - 'tools/exe/dump_pallet'
     - 'tools/exe/palletjack2kea'
+    - 'tools/spec/palletjack2ansible_spec.rb'
     - 'tools/spec/palletjack2kea_spec.rb'
     - 'tools/spec/palletjack2salt_spec.rb'
 
