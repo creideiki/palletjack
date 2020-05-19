@@ -1,0 +1,6 @@
+---
+variables:
+  per-host:
+    each-subtree:
+      system: system
+      service: net.service

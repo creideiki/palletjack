@@ -1,0 +1,7 @@
+---
+variables:
+  global:
+    each-pallet:
+      os: os
+    each-leaf-pallet:
+      netinstall: netinstall
