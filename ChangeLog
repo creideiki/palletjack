@@ -5,6 +5,9 @@ Development
     * New tool palletjack2ansible, for writing Ansible inventories and
       variable files
 
+    * New tool palletjack2knotresolver, for configuring the
+      Knot-Resolver recursing DNS resolver
+
   Packaging changes:
 
     * Fixed incompatibility with Ruby 2.7
