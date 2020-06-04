@@ -8,6 +8,14 @@ Development
     * New tool palletjack2knotresolver, for configuring the
       Knot-Resolver recursing DNS resolver
 
+    * Knot-DNS 1 support removed, palletjack2knot1 deleted,
+      palletjack2knot2 renamed to palletjack2knot
+
+  Warehouse changes:
+
+    * palletjack2knot requires a service configuration named
+      "dns-server" containing global configuration values
+
   Packaging changes:
 
     * Fixed incompatibility with Ruby 2.7
