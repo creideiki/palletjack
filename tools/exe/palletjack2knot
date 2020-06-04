@@ -11,38 +11,33 @@
 # "net.dns.alias", each of its interfaces will get that alias in its
 # own domain. Aliases explicitly specified on a single interface will
 # override this.
-#
-# To adapt this code to a specific DNS server, implement #zone_config
-# to take the name of a zone and output the configuration block for
-# telling the server about it. Also, implement #toolname to return the
-# name of the running tool.
 
 require 'palletjack/tool'
 require 'dns/zone'
 require 'ip'
 
-class PalletJack2Zones < PalletJack::Tool
-  def toolname
-    'PalletJack2Zones base class'
-  end
-
-  def zone_config(zone)
-  end
-
+class PalletJack2Knot < PalletJack::Tool
   def parse_options(opts)
     # rubocop:disable Layout/FirstArgumentIndentation
     opts.banner =
-"Usage: #{$PROGRAM_NAME} -w <warehouse> -o <output directory>
+"Usage: #{$PROGRAM_NAME} -w <warehouse> -o <output directory> -s <service>
 
-Write DNS server zone files from a Palletjack warehouse"
+Write Knot DNS server configuration and zone files from a Palletjack warehouse"
     # rubocop:enable Layout/FirstArgumentIndentation
 
-    opts.on('-o DIR', '--output DIR', 'output directory', String) {|dir|
+    # rubocop:disable Style/BlockDelimiters
+    opts.on('-o DIR', '--output DIR', 'output directory', String) { |dir|
       options[:output] = dir
       options[:zone_dir] = config_path(:output, 'zones')
     }
+    # rubocop:enable Style/BlockDelimiters
+
+    opts.on('-s SERVICE', '--service SERVICE',
+            'service name for global configuration',
+            String) { |service| options[:service] = service }
 
     required_option :output
+    required_option :service
   end
 
   # Generate and store forward zone data for a Pallet Jack domain
@@ -158,6 +153,10 @@ Write DNS server zone files from a Palletjack warehouse"
     @reverse_zones[zone_file_name] = reverse_zone
   end
 
+  attr_reader :knot_config
+  attr_reader :forward_zones
+  attr_reader :reverse_zones
+
   def process
     config_dir :zone_dir
 
@@ -169,6 +168,11 @@ Write DNS server zone files from a Palletjack warehouse"
     # the same one
     @serial = Time.now.utc.to_i
 
+    service = jack.fetch(kind:        'service',
+                         parent_name: 'dns-server',
+                         name:        options[:service])
+    @knot_config = service['service.knot']
+
     jack.each(kind: 'domain') do |domain|
       process_forward_zone(domain)
       process_reverse_zone(domain)
@@ -176,24 +180,35 @@ Write DNS server zone files from a Palletjack warehouse"
   end
 
   def output
-    config_file :output, 'zones.conf' do |conf_file|
-      conf_file << git_header(toolname)
+    config_file :output, 'knot.conf' do |conf_file|
+      conf_file << git_header('palletjack2knot')
+      conf_file << @knot_config.to_yaml
 
       @forward_zones.each do |domain, zone|
         config_file :zone_dir, "#{domain}.zone" do |zonefile|
-          zonefile << git_header(toolname, comment_char: ';')
+          zonefile << git_header('palletjack2knot', comment_char: ';')
           zonefile << zone.dump_pretty
-          conf_file << zone_config(domain)
+          conf_file << "
+zone:
+  - domain: #{domain}
+"
         end
       end
 
       @reverse_zones.each do |domain, zone|
         config_file :zone_dir, "#{domain}.zone" do |zonefile|
-          zonefile << git_header(toolname, comment_char: ';')
+          zonefile << git_header('palletjack2knot', comment_char: ';')
           zonefile << zone.dump_pretty
-          conf_file << zone_config(domain)
+          conf_file << "
+zone:
+  - domain: #{domain}
+"
         end
       end
     end
   end
+end
+
+if PalletJack2Knot.standalone?(__FILE__)
+  PalletJack2Knot.run
 end
