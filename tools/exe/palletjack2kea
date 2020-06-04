@@ -22,12 +22,9 @@ Write configuration for the Kea DHCP server from a Palletjack warehouse"
     required_option :service
   end
 
-  def dhcp4_option(code, name, data)
+  def dhcp4_option(name, data)
     {
-      'code' => code,
       'name' => name,
-      'space' => 'dhcp4',
-      'csv-format' => true,
       'data' => data
     }
   end
@@ -52,7 +49,7 @@ Write configuration for the Kea DHCP server from a Palletjack warehouse"
                     'option-data' => []}
       if net['net.ipv4.gateway']
         net_config['option-data'] <<
-          dhcp4_option(3, 'routers', net['net.ipv4.gateway'])
+          dhcp4_option('routers', net['net.ipv4.gateway'])
       end
 
       if net['net.dns.resolver']
@@ -62,12 +59,12 @@ Write configuration for the Kea DHCP server from a Palletjack warehouse"
         end
 
         net_config['option-data'] <<
-          dhcp4_option(6, 'domain-name-servers', resolvers.chomp(', '))
+          dhcp4_option('domain-name-servers', resolvers.chomp(', '))
       end
 
       if net['net.dhcp.tftp-server']
         net_config['option-data'] <<
-          dhcp4_option(66, 'tftp-server-name', net['net.dhcp.tftp-server'])
+          dhcp4_option('tftp-server-name', net['net.dhcp.tftp-server'])
 
         # Option 66/tftp-server-name is the standard way of sending a
         # TFTP server address, but some DHCP clients still want it in
@@ -77,7 +74,7 @@ Write configuration for the Kea DHCP server from a Palletjack warehouse"
 
       if net['net.dhcp.boot-file']
         net_config['option-data'] <<
-          dhcp4_option(67, 'boot-file-name', net['net.dhcp.boot-file'])
+          dhcp4_option('boot-file-name', net['net.dhcp.boot-file'])
       end
 
       net.children(kind:  'ipv4_interface',
@@ -89,7 +86,7 @@ Write configuration for the Kea DHCP server from a Palletjack warehouse"
           'hostname' => interface['net.dns.fqdn'],
           'option-data' =>
           [
-            dhcp4_option(15, 'domain-name',
+            dhcp4_option('domain-name',
                          interface.parents(kind: 'system').first['net.dns.domain'])
           ]
         }

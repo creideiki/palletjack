@@ -29,6 +29,15 @@ describe 'palletjack2kea' do
           'lease-database' => {
             'type' => 'memfile'
           },
+          'loggers' => [
+            {
+              'name' => 'kea-dhcp4',
+              'output_options' => [
+                {'output'=>'stdout', 'pattern'=>"%-5p %m\n"}
+              ],
+              'severity'=>'INFO'
+            }
+          ],
           'valid-lifetime' => lambda { |value|
                               value.is_a?(String) &&
                               value.to_i != 0
@@ -61,10 +70,7 @@ describe 'palletjack2kea' do
         'hostname' => 'vmhost1.example.com',
         'option-data' => [
           {
-            'code' => 15,
             'name' => 'domain-name',
-            'space' => 'dhcp4',
-            'csv-format' => true,
             'data' => 'example.com'
           }
         ]
@@ -81,32 +87,26 @@ describe 'palletjack2kea' do
         option = @tool.kea_config['Dhcp4']['subnet4'].first['option-data'].find { |o|
                    o['name'] == reference['name']
                  }
-        reference['space'] = 'dhcp4'
-        reference['csv-format'] = true
         expect(option).to have_structure(reference)
       end
 
       it 'default gateway' do
-        check_dhcp_option({'code' => 3,
-                           'name' => 'routers',
+        check_dhcp_option({'name' => 'routers',
                            'data' => '192.168.0.1'})
       end
 
       it 'DNS resolver' do
-        check_dhcp_option({'code' => 6,
-                           'name' => 'domain-name-servers',
+        check_dhcp_option({'name' => 'domain-name-servers',
                            'data' => '192.168.0.1'})
       end
 
       it 'TFTP server' do
-        check_dhcp_option({'code' => 66,
-                           'name' => 'tftp-server-name',
+        check_dhcp_option({'name' => 'tftp-server-name',
                            'data' => '192.168.0.1'})
       end
 
       it 'PXE boot file name' do
-        check_dhcp_option({'code' => 67,
-                           'name' => 'boot-file-name',
+        check_dhcp_option({'name' => 'boot-file-name',
                            'data' => 'pxelinux.0'})
       end
     end
