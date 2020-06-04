@@ -15,18 +15,24 @@ class PalletJack2Ansible < PalletJack::Tool
   def parse_options(opts)
     # rubocop:disable Layout/FirstArgumentIndentation
     opts.banner =
-"Usage: #{$PROGRAM_NAME} -w <warehouse> [ -d <dir> ]
+"Usage: #{$PROGRAM_NAME} -w <warehouse> [ -d <dir> ] [ -i ]
 
 Write Ansible inventory data from a Palletjack warehouse.
 
 The inventory will be written to $dir/inventory.yaml, with
 global variables written to $dir/group_vars/all and host variables
-to $dir/host_vars/$hostname."
+to $dir/host_vars/$hostname.
+
+Allows using IPv4 addresses in the inventory in addition to hostnames,
+to support bootstrapping and situations when the Ansible control node
+cannot resolve names in the Pallet Jack system.
+"
     # rubocop:enable Layout/FirstArgumentIndentation
 
     opts.on('-d DIR', '--directory DIR', 'Ansible inventory directory',
             String) { |dir| options[:dir] = dir }
-
+    opts.on('-i', '--use-ipv4', 'Write IPv4 addresses to inventory') { |ip|
+             options[:use_ip] = ip }
     required_option :dir
   end
 
@@ -35,7 +41,14 @@ to $dir/host_vars/$hostname."
   def process_inventory
     inventory = { 'all' => { 'hosts' => {} } }
     jack.each(kind: 'system') do |system|
-      inventory['all']['hosts'][system['net.dns.fqdn']] = nil
+      if options[:use_ip]
+        iface = jack.fetch(kind: 'ipv4_interface',
+                           all?:{'net.dns.fqdn' => system['net.dns.fqdn']})
+        ip = {'ansible_host' => iface['net.ipv4.address']}
+      else
+        ip = nil
+      end
+      inventory['all']['hosts'][system['net.dns.fqdn']] = ip
     end
     inventory
   end
