@@ -156,7 +156,6 @@ Style/BlockDelimiters:
     - 'tools/exe/dump_pallet'
     - 'tools/exe/palletjack2ipahost'
     - 'tools/exe/palletjack2unbound'
-    - 'tools/lib/palletjack2zones.rb'
     - 'tools/spec/palletjack2kea_spec.rb'
     - 'tools/spec/palletjack2unbound_spec.rb'
 
@@ -238,7 +237,6 @@ Style/EmptyLiteral:
 Style/EmptyMethod:
   Exclude:
     - 'lib/palletjack/tool.rb'
-    - 'tools/lib/palletjack2zones.rb'
 
 # Offense count: 2
 # Cop supports --auto-correct.
@@ -271,7 +269,6 @@ Layout/FirstParameterIndentation:
     - 'tools/exe/palletjack2pxelinux'
     - 'tools/exe/palletjack2salt'
     - 'tools/exe/palletjack2unbound'
-    - 'tools/lib/palletjack2zones.rb'
 
 # Offense count: 2
 # Configuration parameters: EnforcedStyle, SupportedStyles.
@@ -293,9 +290,9 @@ Style/GlobalVars:
     - 'spec/spec_helper.rb'
     - 'tools/spec/palletjack2ansible_spec.rb'
     - 'tools/spec/palletjack2kea_spec.rb'
+    - 'tools/spec/palletjack2knot_spec.rb'
     - 'tools/spec/palletjack2salt_spec.rb'
     - 'tools/spec/palletjack2unbound_spec.rb'
-    - 'tools/spec/palletjack2zones_spec.rb'
     - 'tools/spec/spec_helper.rb'
 
 # Offense count: 2
@@ -332,7 +329,6 @@ Layout/AssignmentIndentation:
   Exclude:
     - 'lib/palletjack/tool.rb'
     - 'tools/exe/*'
-    - 'tools/lib/palletjack2zones.rb'
     - 'tools/spec/palletjack2ansible_spec.rb'
     - 'tools/spec/palletjack2kea_spec.rb'
     - 'tools/spec/palletjack2salt_spec.rb'
@@ -452,7 +448,7 @@ Layout/SpaceBeforeBlockBraces:
     - 'spec/palletjack-tool_spec.rb'
     - 'spec/palletjack_spec.rb'
     - 'tools/spec/palletjack2unbound_spec.rb'
-    - 'tools/spec/palletjack2zones_spec.rb'
+    - 'tools/spec/palletjack2knot_spec.rb'
 
 # Offense count: 37
 # Cop supports --auto-correct.
@@ -471,9 +467,8 @@ Layout/SpaceInsideBlockBraces:
     - 'tools/exe/palletjack2pxelinux'
     - 'tools/exe/palletjack2salt'
     - 'tools/exe/palletjack2unbound'
-    - 'tools/lib/palletjack2zones.rb'
     - 'tools/spec/palletjack2unbound_spec.rb'
-    - 'tools/spec/palletjack2zones_spec.rb'
+    - 'tools/spec/palletjack2knot_spec.rb'
 
 # Offense count: 31
 # Cop supports --auto-correct.
@@ -512,10 +507,13 @@ Style/SymbolProc:
 Style/TrailingUnderscoreVariable:
   Exclude:
     - 'tools/exe/palletjack2unbound'
-    - 'tools/lib/palletjack2zones.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
 Style/WhileUntilDo:
   Exclude:
     - 'lib/palletjack/pallet/identity.rb'
+
+Layout/HashAlignment:
+  Exclude:
+    - 'tools/spec/*'

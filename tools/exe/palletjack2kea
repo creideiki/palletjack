@@ -44,9 +44,9 @@ Write configuration for the Kea DHCP server from a Palletjack warehouse"
     @kea_config['Dhcp4']['subnet4'] = []
 
     service.descendants(kind: 'ipv4_network') do |net|
-      net_config = {'subnet' => net['net.ipv4.cidr'],
+      net_config = {'subnet'       => net['net.ipv4.cidr'],
                     'reservations' => [],
-                    'option-data' => []}
+                    'option-data'  => []}
       if net['net.ipv4.gateway']
         net_config['option-data'] <<
           dhcp4_option('routers', net['net.ipv4.gateway'])
@@ -81,11 +81,10 @@ Write configuration for the Kea DHCP server from a Palletjack warehouse"
                    none?: { 'net.layer2.address' => nil }
                   ) do |interface|
         net_config['reservations'] << {
-          'hw-address' => interface['net.layer2.address'],
-          'ip-address' => interface['net.ipv4.address'],
-          'hostname' => interface['net.dns.fqdn'],
-          'option-data' =>
-          [
+          'hw-address'  => interface['net.layer2.address'],
+          'ip-address'  => interface['net.ipv4.address'],
+          'hostname'    => interface['net.dns.fqdn'],
+          'option-data' => [
             dhcp4_option('domain-name',
                          interface.parents(kind: 'system').first['net.dns.domain'])
           ]

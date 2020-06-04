@@ -33,7 +33,7 @@ describe 'palletjack2kea' do
             {
               'name' => 'kea-dhcp4',
               'output_options' => [
-                {'output'=>'stdout', 'pattern'=>"%-5p %m\n"}
+                { 'output' => 'stdout', 'pattern' => "%-5p %m\n" }
               ],
               'severity'=>'INFO'
             }

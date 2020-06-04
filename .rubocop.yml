@@ -18,9 +18,12 @@ Layout/EmptyLineAfterGuardClause:
     - 'tools/exe/palletjack2ipahost'
 Layout/HashAlignment:
   EnforcedColonStyle: table
+  EnforcedHashRocketStyle: table
 Style/RedundantReturn:
   Exclude:
     - 'lib/palletjack/tool.rb'
 Style/RescueStandardError:
   Exclude:
     - 'lib/palletjack/tool.rb'
+Style/TrailingUnderscoreVariable:
+  Enabled: false

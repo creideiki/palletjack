@@ -31,8 +31,10 @@ cannot resolve names in the Pallet Jack system.
 
     opts.on('-d DIR', '--directory DIR', 'Ansible inventory directory',
             String) { |dir| options[:dir] = dir }
+    # rubocop:disable Style/BlockDelimiters, Layout/BlockEndNewline
     opts.on('-i', '--use-ipv4', 'Write IPv4 addresses to inventory') { |ip|
              options[:use_ip] = ip }
+    # rubocop:enable Style/BlockDelimiters, Layout/BlockEndNewline
     required_option :dir
   end
 
@@ -43,8 +45,8 @@ cannot resolve names in the Pallet Jack system.
     jack.each(kind: 'system') do |system|
       if options[:use_ip]
         iface = jack.fetch(kind: 'ipv4_interface',
-                           all?:{'net.dns.fqdn' => system['net.dns.fqdn']})
-        ip = {'ansible_host' => iface['net.ipv4.address']}
+                           all?: { 'net.dns.fqdn' => system['net.dns.fqdn'] })
+        ip = { 'ansible_host' => iface['net.ipv4.address'] }
       else
         ip = nil
       end
@@ -85,10 +87,12 @@ cannot resolve names in the Pallet Jack system.
     result = {}
 
     system.children(kind: 'ipv4_interface') do |interface|
+      # rubocop:disable Layout/HashAlignment
       result[interface['net.layer2.name']] = {
         interface['net.ipv4.address'] =>
-        interface.filter('net.ipv4', 'net.layer2').to_hash
+          interface.filter('net.ipv4', 'net.layer2').to_hash
       }
+      # rubocop:enable Layout/HashAlignment
     end
 
     result
