@@ -14,17 +14,15 @@
 service:
   knot:
     server:
-      rundir: "/run/knot"
-      user: "knot:knot"
-      listen:
-        - "127.0.0.1@53"
-        - "::1@53"
+      rundir: /run/knot
+      user: knot:knot
+      listen: "[ 0.0.0.0@53, ::@53 ]"
     log:
       - target: syslog
         any: info
     database:
-      storage: "/var/lib/knot"
+      storage: /var/lib/knot
     template:
       - id: default
-        storage: "/var/lib/knot"
+        storage: /var/lib/knot
         file: "%s.zone"

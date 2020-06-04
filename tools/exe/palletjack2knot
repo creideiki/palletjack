@@ -182,7 +182,18 @@ Write Knot DNS server configuration and zone files from a Palletjack warehouse"
   def output
     config_file :output, 'knot.conf' do |conf_file|
       conf_file << git_header('palletjack2knot')
-      conf_file << @knot_config.to_yaml
+      # Knot's configuration is a "simplified YAML format", which
+      # seriously dislikes Ruby's default (conforming) output. Do some
+      # horrible string manipulation to bash it into shape, and hope
+      # that neither the default config nor Knot's parser changes very
+      # much.
+      conf_file << @knot_config
+                   .to_yaml
+                   .delete_prefix('---')
+                   .delete('"')
+                   .delete('\'')
+                   .delete('!')
+                   .gsub(':  ', ': ')
 
       @forward_zones.each do |domain, zone|
         config_file :zone_dir, "#{domain}.zone" do |zonefile|

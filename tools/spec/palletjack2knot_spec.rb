@@ -46,7 +46,7 @@ describe 'palletjack2knot' do
           'database' => { 'storage' => '/var/lib/knot' },
           'log'      => [{ 'any'    => 'info',
                            'target' => 'syslog' }],
-          'server'   => { 'listen' => ['127.0.0.1@53', '::1@53'],
+          'server'   => { 'listen' => '[ 0.0.0.0@53, ::@53 ]',
                           'rundir' => '/run/knot',
                           'user'   => 'knot:knot' },
           'template' => [{ 'file' => '%s.zone',
