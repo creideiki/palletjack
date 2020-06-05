@@ -138,7 +138,7 @@ cannot resolve names in the Pallet Jack system.
     config_file :dir, 'group_vars', 'all' do |varfile|
       varfile << git_header('palletjack2ansible')
       varfile <<
-        { 'palletjack' => { 'global' => @ansible_config[:global] } }.to_yaml
+        { 'palletjack_global' => @ansible_config[:global] }.to_yaml
     end
 
     config_dir :dir, 'host_vars'
