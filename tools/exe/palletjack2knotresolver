@@ -5,6 +5,10 @@
 #
 # Data model assumptions:
 # - Each domain has its authoritative servers present in the warehouse
+# - A domain corresponds uniquely to an IPv4 network
+# - Delegations happen only on octet boundaries (no RFC 2317 classless
+#   in-addr.arpa delegation)
+# - Forward and reverse names are handled by the same servers
 #
 # If you have working delegation on the public Internet, you do not
 # need this utility. Simply update your DNS master server using
@@ -15,6 +19,7 @@
 # work from inside the network.
 
 require 'palletjack/tool'
+require 'ip'
 
 class PalletJack2KnotResolver < PalletJack::Tool
   def parse_options(opts)
@@ -39,6 +44,14 @@ Write Knot-Resolver recursing DNS resolver configuration from a Palletjack wareh
                         domain['net.dns.soa-ns'].chomp('.') })
       @domains[domain['net.dns.domain']] = ns['net.ipv4.address']
       # rubocop:enable Layout/HashAlignment
+
+      next unless domain['net.ipv4.cidr']
+
+      ip_net = IP.new(domain['net.ipv4.cidr'])
+      prefix_octets, _ = domain['net.ipv4.prefixlen'].to_i.divmod(8)
+      reverse_zone =
+        ip_net.to_arpa.split('.')[-(2 + prefix_octets)..5].join('.')
+      @domains[reverse_zone] = ns['net.ipv4.address']
     end
   end
 

@@ -19,7 +19,10 @@ describe 'palletjack2knotresolver' do
   it 'points to the correct authoritative server' do
     @tool = PalletJack2KnotResolver.instance
     expect(@tool.domains).to eq(
-      { 'example.com' => '192.168.0.3' }
+      {
+        'example.com'            => '192.168.0.3',
+        '0.168.192.in-addr.arpa' => '192.168.0.3'
+      }
     )
   end
 end
