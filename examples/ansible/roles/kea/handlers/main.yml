@@ -1,0 +1,5 @@
+---
+- name: Restart Kea DHCPv4
+  service:
+    name: kea-dhcp4
+    state: restarted

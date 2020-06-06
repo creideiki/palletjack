@@ -1,0 +1,51 @@
+---
+- name: Enable EPEL repository
+  package:
+    name: epel-release
+    state: installed
+
+- name: Install Knot
+  package:
+    name: knot
+    state: present
+
+- name: Install Knot configuration file
+  copy:
+    src: knot.conf
+    dest: /etc/knot/knot.conf
+    owner: root
+    group: root
+    mode: "0444"
+    seuser: system_u
+    serole: object_r
+    setype: etc_t
+    selevel: s0
+  notify:
+    - Restart Knot
+
+- name: Install Zone files
+  copy:
+    src: zones/
+    dest: /var/lib/knot/
+    owner: root
+    group: root
+    mode: "0444"
+    seuser: system_u
+    serole: object_r
+    setype: var_lib_t
+    selevel: s0
+  notify:
+    - Restart Knot
+
+- name: Open firewall for Knot
+  firewalld:
+    immediate: yes
+    permanent: yes
+    service: dns
+    state: enabled
+
+- name: Enable Knot service
+  service:
+    name: knot
+    enabled: yes
+    state: started

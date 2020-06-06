@@ -1,0 +1,34 @@
+---
+- name: Install LigHTTPd
+  package:
+    name: lighttpd
+    state: present
+
+- name: Install Kickstart files
+  template:
+    src: "{{ item.value.system.os }}.j2"
+    dest: /var/www/lighttpd/{{ item.value.host.netinstall.config }}.cfg
+    owner: root
+    group: root
+    mode: "0444"
+    seuser: system_u
+    serole: object_r
+    setype: httpd_sys_content_t
+    selevel: s0
+  loop: "{{ palletjack_global.netinstall | dict2items }}"
+
+- name: Open firewall for LigHTTPd
+  firewalld:
+    immediate: yes
+    permanent: yes
+    service: "{{ item }}"
+    state: enabled
+  loop:
+  - http
+  - https
+
+- name: Enable LigHTTPd service
+  service:
+    name: lighttpd
+    enabled: yes
+    state: started

@@ -59,3 +59,10 @@ lca2017-presentation.odp
 Notes from the presentation given at the Linux.Conf.Au 2017 Sysadmin
 miniconf about Pallet Jack. Recording available at
 https://www.youtube.com/watch?v=4oq4ursOnlw
+
+
+ansible
+-------
+
+Ansible playbooks and roles for managing a full network defined by
+Pallet Jack.

@@ -20,6 +20,11 @@ Development
 
     * Fixed incompatibility with Ruby 2.7
 
+  Integration changes:
+
+    * Includes an example set of Ansible roles for maintaining an
+      entire environment
+
 v0.7.3.creideiki.0.9.1 2017-10-19
 
   Tool changes:

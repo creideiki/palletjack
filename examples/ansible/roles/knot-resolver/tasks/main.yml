@@ -1,0 +1,37 @@
+---
+- name: Enable EPEL repository
+  package:
+    name: epel-release
+    state: installed
+
+- name: Install Knot-Resolver
+  package:
+    name: knot-resolver
+    state: present
+
+- name: Install Knot-Resolver configuration file
+  copy:
+    src: kresd.conf
+    dest: /etc/knot-resolver/kresd.conf
+    owner: root
+    group: root
+    mode: "0444"
+    seuser: system_u
+    serole: object_r
+    setype: etc_t
+    selevel: s0
+  notify:
+    - Restart Knot-Resolver
+
+- name: Open firewall for Knot-Resolver
+  firewalld:
+    immediate: yes
+    permanent: yes
+    service: dns
+    state: enabled
+
+- name: Enable Knot-Resolver service
+  service:
+    name: kresd@1
+    enabled: yes
+    state: started
