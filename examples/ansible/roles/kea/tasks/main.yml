@@ -1,0 +1,62 @@
+---
+- name: Install Kea repository signing key
+  copy:
+    src: isc-kea-repo.key
+    dest: /etc/pki/rpm-gpg/isc-kea-repo.key
+    owner: root
+    group: root
+    mode: "0444"
+    seuser: system_u
+    serole: object_r
+    setype: cert_t
+    selevel: s0
+
+- name: Enable Kea repository signing key
+  rpm_key:
+    key: /etc/pki/rpm-gpg/isc-kea-repo.key
+    state: present
+
+- name: Enable Kea repositories
+  yum_repository:
+    name: isc-kea-1-7-{{ item }}
+    description: isc-kea-1-7-{{ item }}
+    baseurl: "{{ 'https://dl.cloudsmith.io/public/isc/kea-1-7/rpm/el/8/' + item }}"
+    gpgcheck: true
+    enabled: true
+    gpgkey: /etc/pki/rpm-gpg/isc-kea-repo.key
+    state: present
+  loop:
+    - x86_64
+    - noarch
+
+- name: Install Kea
+  package:
+    name: isc-kea
+    state: present
+
+- name: Install Kea configuration file
+  copy:
+    src: kea-dhcp4.conf
+    dest: /etc/kea/kea-dhcp4.conf
+    owner: root
+    group: root
+    mode: "0444"
+    seuser: system_u
+    serole: object_r
+    setype: etc_t
+    selevel: s0
+  notify:
+    - Restart Kea DHCPv4
+
+- name: Open firewall for Kea
+  firewalld:
+    immediate: yes
+    permanent: yes
+    service: dhcp
+    state: enabled
+
+- name: Enable Kea service
+  service:
+    name: kea-dhcp4
+    enabled: yes
+    state: started

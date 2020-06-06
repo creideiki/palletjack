@@ -1,0 +1,78 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Write DNS resolver configuration from a Palletjack warehouse
+#
+# Data model assumptions:
+# - Each domain has its authoritative servers present in the warehouse
+# - A domain corresponds uniquely to an IPv4 network
+# - Delegations happen only on octet boundaries (no RFC 2317 classless
+#   in-addr.arpa delegation)
+# - Forward and reverse names are handled by the same servers
+#
+# If you have working delegation on the public Internet, you do not
+# need this utility. Simply update your DNS master server using
+# palletjack2knot and your regular recursing resolver will find it.
+# However, if you are running Pallet Jack on an air-gapped network or
+# on a subdomain which does not have correct delegation, this utility
+# will produce a configuration for a recursing DNS resolver that will
+# work from inside the network.
+
+require 'palletjack/tool'
+require 'ip'
+
+class PalletJack2KnotResolver < PalletJack::Tool
+  def parse_options(opts)
+    # rubocop:disable Layout/FirstArgumentIndentation
+    opts.banner =
+"Usage: #{$PROGRAM_NAME} -w <warehouse>
+
+Write Knot-Resolver recursing DNS resolver configuration from a Palletjack warehouse"
+    # rubocop:enable Layout/FirstArgumentIndentation
+  end
+
+  attr_reader :domains
+
+  def process
+    # Mapping of domain name -> authoritative server IP
+    @domains = {}
+
+    jack.each(kind: 'domain') do |domain|
+      # rubocop:disable Layout/HashAlignment
+      ns = jack.fetch(kind: 'ipv4_interface',
+                      all?: { 'net.dns.fqdn' =>
+                        domain['net.dns.soa-ns'].chomp('.') })
+      @domains[domain['net.dns.domain']] = ns['net.ipv4.address']
+      # rubocop:enable Layout/HashAlignment
+
+      next unless domain['net.ipv4.cidr']
+
+      ip_net = IP.new(domain['net.ipv4.cidr'])
+      prefix_octets, _ = domain['net.ipv4.prefixlen'].to_i.divmod(8)
+      reverse_zone =
+        ip_net.to_arpa.split('.')[-(2 + prefix_octets)..5].join('.')
+      @domains[reverse_zone] = ns['net.ipv4.address']
+    end
+  end
+
+  def output
+    puts git_header('palletjack2knotresolver', comment_char: '--')
+    puts '
+net.listen(\'0.0.0.0\', 53, { kind = \'dns\' })
+net.listen(\'::\', 53, { kind = \'dns\' })
+
+modules = {
+        \'stats\',
+        \'predict\'
+}
+'
+    @domains.each do |domain, ns|
+      puts format('policy.add(policy.suffix(policy.STUB({\'%<ns>s\'}), policy.todnames({\'%<domain>s\'})))',
+                  ns: ns, domain: domain)
+    end
+  end
+end
+
+if PalletJack2KnotResolver.standalone?(__FILE__)
+  PalletJack2KnotResolver.run
+end

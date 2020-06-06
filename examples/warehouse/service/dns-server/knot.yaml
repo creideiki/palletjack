@@ -1,0 +1,28 @@
+# The Knot DNS server uses YAML for configuration, which means we can
+# replicate the same structure here and just dump it in.
+#
+# Everything under the key "service.kknot" will be inserted in the Kea
+# configuration structure root. See the documentation at
+# <URL:https://www.knot-dns.cz/docs/latest/singlehtml/> for details.
+#
+# This file resides in the 'dns-server' directory and provides
+# defaults for all DNS server instances in subdirectories.
+#
+# This configuration represents the defaults in CentOS 8's packaging
+# of Knot 2.9.4, since we have to replace that entire file.
+
+service:
+  knot:
+    server:
+      rundir: /run/knot
+      user: knot:knot
+      listen: "[ 0.0.0.0@53, ::@53 ]"
+    log:
+      - target: syslog
+        any: info
+    database:
+      storage: /var/lib/knot
+    template:
+      - id: default
+        storage: /var/lib/knot
+        file: "%s.zone"

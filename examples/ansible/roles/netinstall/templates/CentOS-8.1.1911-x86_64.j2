@@ -1,0 +1,34 @@
+text
+keyboard --vckeymap=se --xlayouts='se'
+lang en_US.UTF-8
+# Default root password is "palletjack"
+rootpw --iscrypted $6$u9tQWxL9/vPgNyW7$6v7aJGTIxnGybnoF0CEyjptmoPaMC9PnNI4kLDm7wBX2hjiPbORuttYmv56QUDS.ZR5yLlSKl/.x/iecRi7TX1
+firstboot --disable
+skipx
+services --enabled="chronyd"
+timezone Europe/Stockholm --isUtc --ntpservers=1.centos.pool.ntp.org,2.centos.pool.ntp.org,3.centos.pool.ntp.org
+reboot
+
+selinux --enforcing
+firewall --enabled --ssh
+
+url --url={{ item.value.host.netinstall.baseurl }}
+
+%packages
+@^minimal-environment
+@guest-agents
+-plymouth
+%end
+
+%addon com_redhat_kdump --disable --reserve-mb='auto'
+%end
+
+#logging --host=syslog
+
+{% if item.value.host.netinstall.use_disk is defined %}
+zerombr
+ignoredisk --only-use={{ item.value.host.netinstall.use_disk }}
+clearpart --all --initlabel
+bootloader --location=mbr
+autopart --nohome
+{% endif %}

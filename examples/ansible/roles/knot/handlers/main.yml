@@ -1,0 +1,5 @@
+---
+- name: Restart Knot
+  service:
+    name: knot
+    state: restarted

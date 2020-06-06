@@ -16,7 +16,7 @@
 #   host:
 #     netinstall:
 #       label: <human-friendly label for variant>
-#       ksurl: ["none"|<URL to netinstall file>]
+#       config_url: ["none"|<URL to netinstall file>]
 #     pxelinux:
 #       config: <basename of pxelinux menu file w/o .menu>
 #       kernel: <tftp path of pxelinux kernel>

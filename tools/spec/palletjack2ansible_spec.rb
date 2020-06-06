@@ -35,6 +35,41 @@ describe 'palletjack2ansible' do
     end
   end
 
+  context 'generated host inventory with IPv4 addresses' do
+    before :each do
+      @tool = PalletJack2Ansible.instance
+      allow(@tool).to receive(:argv).and_return(
+        ['-w', $EXAMPLE_WAREHOUSE,
+         '-i',
+         '-d', Dir.tmpdir]) # Won't actually be written to, but needs
+                            # to exist to make the command line option
+                            # parser happy
+      @tool.setup
+      @tool.process
+      @inventory = @tool.ansible_config[:inventory]
+    end
+
+    it 'contains the global group' do
+      all_hosts = { 'all' => { 'hosts' => Hash } }
+      expect(@inventory).to have_structure all_hosts
+    end
+
+    it 'contains all hosts in the warehouse' do
+      @tool.jack.each(kind: 'system') do |system|
+        expect(@inventory['all']['hosts']).to include system['net.dns.fqdn']
+      end
+    end
+
+    it 'has network configuration embedded in the inventory' do
+      expect(@inventory['all']['hosts']).to have_structure(
+        {
+          'vmhost1.example.com' => { 'ansible_host' => '192.168.0.1' },
+          'testvm.example.com'  => { 'ansible_host' => '192.168.0.2' }
+        }
+      )
+    end
+  end
+
   context 'generated global configuration' do
     before :each do
       @tool = PalletJack2Ansible.instance

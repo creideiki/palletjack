@@ -89,10 +89,12 @@ Write Salt pillar data from a Palletjack warehouse."
     result = Hash.new
 
     system.children(kind: 'ipv4_interface') do |interface|
+      # rubocop:disable Layout/HashAlignment
       result[interface['net.layer2.name']] = {
         interface['net.ipv4.address'] =>
-        interface.filter('net.ipv4', 'net.layer2').to_hash
+          interface.filter('net.ipv4', 'net.layer2').to_hash
       }
+      # rubocop:enable Layout/HashAlignment
     end
 
     result

@@ -1,0 +1,52 @@
+---
+- name: Enable EPEL repository
+  package:
+    name: epel-release
+    state: installed
+
+- name: Install TFTP server
+  package:
+    name: tftp-server
+    state: present
+
+- name: Install PXELINUX
+  package:
+    name: syslinux-tftpboot
+    state: present
+
+- name: Link PXELINUX payloads to TFTP root
+  file:
+    src: '/tftpboot/{{ item }}'
+    path: '/var/lib/tftpboot/{{ item }}'
+    state: hard
+  loop:
+    - libutil.c32
+    - ldlinux.c32
+    - menu.c32
+    - pxelinux.0
+
+- name: Install PXELINUX configuration
+  copy:
+    src: tftpboot/
+    dest: /var/lib/tftpboot/
+    local_follow: no
+    owner: root
+    group: root
+    mode: "0444"
+    seuser: system_u
+    serole: object_r
+    setype: tftpdir_rw_t
+    selevel: s0
+
+- name: Open firewall for TFTP
+  firewalld:
+    immediate: yes
+    permanent: yes
+    service: tftp
+    state: enabled
+
+- name: Enable TFTPd service
+  service:
+    name: tftp.socket
+    enabled: yes
+    state: started

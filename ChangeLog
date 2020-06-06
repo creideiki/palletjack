@@ -5,9 +5,25 @@ Development
     * New tool palletjack2ansible, for writing Ansible inventories and
       variable files
 
+    * New tool palletjack2knotresolver, for configuring the
+      Knot-Resolver recursing DNS resolver
+
+    * Knot-DNS 1 support removed, palletjack2knot1 deleted,
+      palletjack2knot2 renamed to palletjack2knot
+
+  Warehouse changes:
+
+    * palletjack2knot requires a service configuration named
+      "dns-server" containing global configuration values
+
   Packaging changes:
 
     * Fixed incompatibility with Ruby 2.7
+
+  Integration changes:
+
+    * Includes an example set of Ansible roles for maintaining an
+      entire environment
 
 v0.7.3.creideiki.0.9.1 2017-10-19
 

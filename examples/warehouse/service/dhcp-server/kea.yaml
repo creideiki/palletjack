@@ -17,3 +17,9 @@ service:
         - '*'
     lease-database:
       type: memfile
+    loggers:
+      - name: kea-dhcp4
+        output_options:
+          - output: stdout
+            pattern: "%-5p %m\n"
+        severity: INFO

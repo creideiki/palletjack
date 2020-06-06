@@ -47,9 +47,9 @@ Create phy_nic and ipv4_interface objects in a warehouse"
     pallet_dir 'ipv4_interface', :addr
     pallet_links 'ipv4_interface', :addr,
       'ipv4_network' => ['ipv4_network', :network],
-      'domain' => ['domain', :domain],
-      'phy_nic' => ['phy_nic', :mac],
-      'system' => ['system', :system]
+      'domain'       => ['domain', :domain],
+      'phy_nic'      => ['phy_nic', :mac],
+      'system'       => ['system', :system]
     # rubocop:enable Layout/ArgumentAlignment
   end
 end

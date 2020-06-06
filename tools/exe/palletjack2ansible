@@ -15,18 +15,26 @@ class PalletJack2Ansible < PalletJack::Tool
   def parse_options(opts)
     # rubocop:disable Layout/FirstArgumentIndentation
     opts.banner =
-"Usage: #{$PROGRAM_NAME} -w <warehouse> [ -d <dir> ]
+"Usage: #{$PROGRAM_NAME} -w <warehouse> [ -d <dir> ] [ -i ]
 
 Write Ansible inventory data from a Palletjack warehouse.
 
 The inventory will be written to $dir/inventory.yaml, with
 global variables written to $dir/group_vars/all and host variables
-to $dir/host_vars/$hostname."
+to $dir/host_vars/$hostname.
+
+Allows using IPv4 addresses in the inventory in addition to hostnames,
+to support bootstrapping and situations when the Ansible control node
+cannot resolve names in the Pallet Jack system.
+"
     # rubocop:enable Layout/FirstArgumentIndentation
 
     opts.on('-d DIR', '--directory DIR', 'Ansible inventory directory',
             String) { |dir| options[:dir] = dir }
-
+    # rubocop:disable Style/BlockDelimiters, Layout/BlockEndNewline
+    opts.on('-i', '--use-ipv4', 'Write IPv4 addresses to inventory') { |ip|
+             options[:use_ip] = ip }
+    # rubocop:enable Style/BlockDelimiters, Layout/BlockEndNewline
     required_option :dir
   end
 
@@ -35,7 +43,14 @@ to $dir/host_vars/$hostname."
   def process_inventory
     inventory = { 'all' => { 'hosts' => {} } }
     jack.each(kind: 'system') do |system|
-      inventory['all']['hosts'][system['net.dns.fqdn']] = nil
+      if options[:use_ip]
+        iface = jack.fetch(kind: 'ipv4_interface',
+                           all?: { 'net.dns.fqdn' => system['net.dns.fqdn'] })
+        ip = { 'ansible_host' => iface['net.ipv4.address'] }
+      else
+        ip = nil
+      end
+      inventory['all']['hosts'][system['net.dns.fqdn']] = ip
     end
     inventory
   end
@@ -72,10 +87,12 @@ to $dir/host_vars/$hostname."
     result = {}
 
     system.children(kind: 'ipv4_interface') do |interface|
+      # rubocop:disable Layout/HashAlignment
       result[interface['net.layer2.name']] = {
         interface['net.ipv4.address'] =>
-        interface.filter('net.ipv4', 'net.layer2').to_hash
+          interface.filter('net.ipv4', 'net.layer2').to_hash
       }
+      # rubocop:enable Layout/HashAlignment
     end
 
     result
@@ -121,7 +138,7 @@ to $dir/host_vars/$hostname."
     config_file :dir, 'group_vars', 'all' do |varfile|
       varfile << git_header('palletjack2ansible')
       varfile <<
-        { 'palletjack' => { 'global' => @ansible_config[:global] } }.to_yaml
+        { 'palletjack_global' => @ansible_config[:global] }.to_yaml
     end
 
     config_dir :dir, 'host_vars'

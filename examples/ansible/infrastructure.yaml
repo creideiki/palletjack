@@ -1,0 +1,35 @@
+---
+- name: Configure DHCP server
+  hosts: all
+  tags: kea
+  roles:
+  - role: kea
+    when: '"kea" in palletjack.system.role'
+
+- name: Configure authoritative DNS server
+  hosts: all
+  tags: knot
+  roles:
+  - role: knot
+    when: '"knot" in palletjack.system.role'
+
+- name: Configure recursing DNS resolver
+  hosts: all
+  tags: knot-resolver
+  roles:
+  - role: knot-resolver
+    when: '"knot-resolver" in palletjack.system.role'
+
+- name: Configure PXELINUX network booting
+  hosts: all
+  tags: pxelinux
+  roles:
+  - role: pxelinux
+    when: '"pxelinux" in palletjack.system.role'
+
+- name: Configure LigHTTPd for serving netinstall recipes
+  hosts: all
+  tags: netinstall
+  roles:
+  - role: netinstall
+    when: '"netinstall" in palletjack.system.role'

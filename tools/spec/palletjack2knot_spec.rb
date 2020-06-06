@@ -4,55 +4,78 @@ require 'spec_helper'
 require 'tmpdir'
 require 'rspec/collection_matchers'
 
-require 'palletjack2zones'
+load 'palletjack2knot'
 
-describe 'palletjack2zones' do
+describe 'palletjack2knot' do
   it 'requires an output directory' do
-    @tool = PalletJack2Zones.instance
+    @tool = PalletJack2Knot.instance
     allow(@tool).to receive(:argv).and_return([
-      '-w', $EXAMPLE_WAREHOUSE
+      '-w', $EXAMPLE_WAREHOUSE,
+      '-s', 'example-com'
     ])
     allow($stderr).to receive(:write)
     expect{@tool.setup}.to raise_error SystemExit
   end
 
-  it 'does not write server-specific configuration' do
-    @tool = PalletJack2Zones.instance
-    expect(@tool.zone_config('test')).to eq nil
+  it 'requires a service name' do
+    @tool = PalletJack2Knot.instance
+    allow(@tool).to receive(:argv).and_return([
+      '-w', $EXAMPLE_WAREHOUSE,
+      '-o', Dir.tmpdir
+    ])
+    allow($stderr).to receive(:write)
+    expect{@tool.setup}.to raise_error SystemExit
   end
 
   context 'generates' do
     before :example do
-      @tool = PalletJack2Zones.instance
+      @tool = PalletJack2Knot.instance
       allow(@tool).to receive(:argv).and_return([
         '-w', $EXAMPLE_WAREHOUSE,
-        '-o', Dir.tmpdir
+        '-o', Dir.tmpdir,
+        '-s', 'example-com'
       ])
       @tool.setup
       @tool.process
     end
 
+    it 'global server configuration' do
+      @tool = PalletJack2Knot.instance
+      expect(@tool.knot_config).to have_structure(
+        {
+          'database' => { 'storage' => '/var/lib/knot' },
+          'log'      => [{ 'any'    => 'info',
+                           'target' => 'syslog' }],
+          'server'   => { 'listen' => '[ 0.0.0.0@53, ::@53 ]',
+                          'rundir' => '/run/knot',
+                          'user'   => 'knot:knot' },
+          'template' => [{ 'file' => '%s.zone',
+                           'id'   => 'default',
+          'storage'  => '/var/lib/knot' }]
+        }
+      )
+    end
+
     it 'a forward zone' do
-      zones = @tool.instance_variable_get(:@forward_zones)
-      expect(zones).to have_at_least(1).item
+      expect(@tool.forward_zones).to have_at_least(1).item
     end
 
     it 'a reverse zone' do
-      zones = @tool.instance_variable_get(:@reverse_zones)
-      expect(zones).to have_at_least(1).item
+      expect(@tool.reverse_zones).to have_at_least(1).item
     end
   end
 
   context 'forward zone for example.com' do
     before :example do
-      @tool = PalletJack2Zones.instance
+      @tool = PalletJack2Knot.instance
       allow(@tool).to receive(:argv).and_return([
         '-w', $EXAMPLE_WAREHOUSE,
-        '-o', Dir.tmpdir
+        '-o', Dir.tmpdir,
+        '-s', 'example-com'
       ])
       @tool.setup
       @tool.process
-      @zone = @tool.instance_variable_get(:@forward_zones)['example.com']
+      @zone = @tool.forward_zones['example.com']
     end
 
     it 'has a reasonable timestamp' do
@@ -71,14 +94,15 @@ describe 'palletjack2zones' do
 
   context 'reverse zone for 192.168.0.0/24' do
     before :example do
-      @tool = PalletJack2Zones.instance
+      @tool = PalletJack2Knot.instance
       allow(@tool).to receive(:argv).and_return([
         '-w', $EXAMPLE_WAREHOUSE,
-        '-o', Dir.tmpdir
+        '-o', Dir.tmpdir,
+        '-s', 'example-com'
       ])
       @tool.setup
       @tool.process
-      @zone = @tool.instance_variable_get(:@reverse_zones)['0.168.192.in-addr.arpa']
+      @zone = @tool.reverse_zones['0.168.192.in-addr.arpa']
     end
 
     it 'has a reasonable timestamp' do
